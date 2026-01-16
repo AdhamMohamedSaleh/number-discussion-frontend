@@ -1,0 +1,130 @@
+'use client';
+
+import { useEffect, useState, useCallback } from 'react';
+import { useAuth } from '@/lib/auth-context';
+import { api } from '@/lib/api';
+import { CalculationNode } from '@/lib/types';
+import { AuthForm } from '@/components/auth-form';
+import { CalculationTree } from '@/components/calculation-tree';
+import { CreateCalculationForm } from '@/components/create-calculation-form';
+import { RespondForm } from '@/components/respond-form';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+export function HomePage() {
+  const { user, isLoading, logout } = useAuth();
+  const [calculations, setCalculations] = useState<CalculationNode[]>([]);
+  const [isLoadingCalcs, setIsLoadingCalcs] = useState(true);
+  const [respondingTo, setRespondingTo] = useState<CalculationNode | null>(null);
+  const [error, setError] = useState('');
+
+  const loadCalculations = useCallback(async () => {
+    try {
+      setError('');
+      const data = await api.getCalculations();
+      setCalculations(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load calculations');
+    } finally {
+      setIsLoadingCalcs(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadCalculations();
+  }, [loadCalculations]);
+
+  const handleRespond = (node: CalculationNode) => {
+    setRespondingTo(node);
+  };
+
+  const handleRespondSuccess = () => {
+    setRespondingTo(null);
+    loadCalculations();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="border-b bg-card">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <h1 className="text-xl font-bold">Number Discussions</h1>
+          {user && (
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-muted-foreground">
+                Welcome, <span className="font-medium text-foreground">{user.username}</span>
+              </span>
+              <Button variant="outline" size="sm" onClick={logout}>
+                Logout
+              </Button>
+            </div>
+          )}
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-8">
+        <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+          <div className="space-y-6">
+            {respondingTo && (
+              <RespondForm
+                parentNode={respondingTo}
+                onSuccess={handleRespondSuccess}
+                onCancel={() => setRespondingTo(null)}
+              />
+            )}
+
+            <Card>
+              <CardHeader>
+                <CardTitle>All Discussions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {error && (
+                  <p className="text-sm text-destructive mb-4">{error}</p>
+                )}
+                {isLoadingCalcs ? (
+                  <p className="text-muted-foreground text-center py-8">Loading discussions...</p>
+                ) : (
+                  <CalculationTree
+                    nodes={calculations}
+                    onRespond={handleRespond}
+                    canRespond={!!user}
+                  />
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          <aside className="space-y-6">
+            {user ? (
+              <CreateCalculationForm onSuccess={loadCalculations} />
+            ) : (
+              <AuthForm />
+            )}
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">How It Works</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground space-y-2">
+                <p>Welcome to Number Discussions - a social network where people communicate through math!</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Start a discussion by posting a number</li>
+                  <li>Respond with an operation (+, -, ×, ÷)</li>
+                  <li>Create chains of calculations</li>
+                  <li>See what numbers others discover</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </aside>
+        </div>
+      </main>
+    </div>
+  );
+}
