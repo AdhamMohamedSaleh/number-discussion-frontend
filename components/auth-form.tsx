@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +15,6 @@ interface AuthFormData {
 
 export function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
-  const [error, setError] = useState('');
   const { login, register: registerUser } = useAuth();
 
   const {
@@ -25,28 +25,33 @@ export function AuthForm() {
   } = useForm<AuthFormData>();
 
   const onSubmit = async (data: AuthFormData) => {
-    setError('');
-
     try {
       if (isLogin) {
         await login(data.username, data.password);
+        toast.success('Welcome back!', {
+          description: `Logged in as ${data.username}`,
+        });
       } else {
         await registerUser(data.username, data.password);
+        toast.success('Account created!', {
+          description: 'You can now start creating discussions',
+        });
       }
       reset();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      toast.error(isLogin ? 'Login failed' : 'Registration failed', {
+        description: err instanceof Error ? err.message : 'An error occurred',
+      });
     }
   };
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
-    setError('');
     reset();
   };
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full max-w-sm animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
       <CardHeader>
         <CardTitle>{isLogin ? 'Login' : 'Register'}</CardTitle>
         <CardDescription>
@@ -92,9 +97,6 @@ export function AuthForm() {
               <p className="text-sm text-destructive">{errors.password.message}</p>
             )}
           </div>
-          {error && (
-            <p className="text-sm text-destructive">{error}</p>
-          )}
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? 'Loading...' : isLogin ? 'Login' : 'Register'}
           </Button>

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
+import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { CalculationNode, Operation } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -32,8 +32,6 @@ const formatValue = (value: number) => {
 };
 
 export function RespondForm({ parentNode, onSuccess, onCancel }: RespondFormProps) {
-  const [error, setError] = useState('');
-
   const {
     register,
     handleSubmit,
@@ -65,16 +63,14 @@ export function RespondForm({ parentNode, onSuccess, onCancel }: RespondFormProp
   const preview = calculatePreview();
 
   const onSubmit = async (data: FormData) => {
-    setError('');
-
     const numOperand = parseFloat(data.operand);
     if (isNaN(numOperand)) {
-      setError('Please enter a valid number');
+      toast.error('Invalid number');
       return;
     }
 
     if (data.operation === '/' && numOperand === 0) {
-      setError('Cannot divide by zero');
+      toast.error('Cannot divide by zero');
       return;
     }
 
@@ -83,14 +79,20 @@ export function RespondForm({ parentNode, onSuccess, onCancel }: RespondFormProp
         operation: data.operation,
         operand: numOperand,
       });
+      const result = calculatePreview();
+      toast.success('Response added!', {
+        description: `${formatValue(parentNode.value)} ${OPERATIONS.find(o => o.value === data.operation)?.symbol} ${numOperand} = ${result !== null ? formatValue(result) : '?'}`,
+      });
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to submit response', {
+        description: err instanceof Error ? err.message : 'An error occurred',
+      });
     }
   };
 
   return (
-    <Card className="border-primary/50">
+    <Card className="border-primary/50 animate-in fade-in-0 slide-in-from-top-4 duration-300">
       <CardHeader>
         <CardTitle className="text-base">Respond to {formatValue(parentNode.value)}</CardTitle>
         <CardDescription>
@@ -108,7 +110,7 @@ export function RespondForm({ parentNode, onSuccess, onCancel }: RespondFormProp
                 variant={operation === op.value ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setValue('operation', op.value)}
-                className="flex-1"
+                className="flex-1 transition-all"
               >
                 {op.symbol}
               </Button>
@@ -116,7 +118,7 @@ export function RespondForm({ parentNode, onSuccess, onCancel }: RespondFormProp
           </div>
           <div className="flex items-center gap-3">
             <span className="text-lg font-medium">{formatValue(parentNode.value)}</span>
-            <span className="text-lg text-muted-foreground">
+            <span className="text-lg text-muted-foreground transition-all">
               {OPERATIONS.find((op) => op.value === operation)?.symbol}
             </span>
             <Input
@@ -131,14 +133,15 @@ export function RespondForm({ parentNode, onSuccess, onCancel }: RespondFormProp
             {preview !== null && (
               <>
                 <span className="text-lg text-muted-foreground">=</span>
-                <span className="text-lg font-bold text-primary">{formatValue(preview)}</span>
+                <span className="text-lg font-bold text-primary animate-in fade-in-0 duration-200">
+                  {formatValue(preview)}
+                </span>
               </>
             )}
           </div>
           {errors.operand && (
             <p className="text-sm text-destructive">{errors.operand.message}</p>
           )}
-          {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="flex gap-3">
             <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
               Cancel

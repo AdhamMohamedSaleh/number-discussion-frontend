@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,8 +16,6 @@ interface FormData {
 }
 
 export function CreateCalculationForm({ onSuccess }: CreateCalculationFormProps) {
-  const [error, setError] = useState('');
-
   const {
     register,
     handleSubmit,
@@ -26,25 +24,28 @@ export function CreateCalculationForm({ onSuccess }: CreateCalculationFormProps)
   } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
-    setError('');
-
     const numValue = parseFloat(data.value);
     if (isNaN(numValue)) {
-      setError('Please enter a valid number');
+      toast.error('Invalid number');
       return;
     }
 
     try {
       await api.createCalculation({ value: numValue });
+      toast.success('Discussion started!', {
+        description: `Started with number ${numValue}`,
+      });
       reset();
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to create discussion', {
+        description: err instanceof Error ? err.message : 'An error occurred',
+      });
     }
   };
 
   return (
-    <Card>
+    <Card className="animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
       <CardHeader>
         <CardTitle className="text-base">Start a New Discussion</CardTitle>
       </CardHeader>
@@ -67,7 +68,6 @@ export function CreateCalculationForm({ onSuccess }: CreateCalculationFormProps)
             {isSubmitting ? 'Creating...' : 'Start'}
           </Button>
         </form>
-        {error && <p className="text-sm text-destructive mt-2">{error}</p>}
       </CardContent>
     </Card>
   );
