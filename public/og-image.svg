@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0a0a0a"/>
+  <text x="600" y="280" font-family="system-ui, sans-serif" font-size="72" font-weight="bold" fill="#ffffff" text-anchor="middle">Number Discussions</text>
+  <text x="600" y="380" font-family="system-ui, sans-serif" font-size="32" fill="#a1a1aa" text-anchor="middle">A social network where people communicate through numbers</text>
+  <g transform="translate(480, 450)">
+    <circle cx="40" cy="40" r="30" fill="#3b82f6" opacity="0.8"/>
+    <text x="40" y="50" font-family="system-ui, sans-serif" font-size="28" fill="#ffffff" text-anchor="middle">+</text>
+  </g>
+  <g transform="translate(560, 450)">
+    <circle cx="40" cy="40" r="30" fill="#22c55e" opacity="0.8"/>
+    <text x="40" y="50" font-family="system-ui, sans-serif" font-size="28" fill="#ffffff" text-anchor="middle">−</text>
+  </g>
+  <g transform="translate(640, 450)">
+    <circle cx="40" cy="40" r="30" fill="#f59e0b" opacity="0.8"/>
+    <text x="40" y="50" font-family="system-ui, sans-serif" font-size="28" fill="#ffffff" text-anchor="middle">×</text>
+  </g>
+  <g transform="translate(720, 450)">
+    <circle cx="40" cy="40" r="30" fill="#ef4444" opacity="0.8"/>
+    <text x="40" y="50" font-family="system-ui, sans-serif" font-size="28" fill="#ffffff" text-anchor="middle">÷</text>
+  </g>
+</svg>
