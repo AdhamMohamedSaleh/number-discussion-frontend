@@ -18,14 +18,25 @@ export function Skeleton({ className }: SkeletonProps) {
 export function CalculationSkeleton() {
   return (
     <div className="space-y-4">
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="flex items-center gap-3 p-3 rounded-lg border">
-          <Skeleton className="h-8 w-8 rounded-full" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-3 w-16" />
+      {[0, 1, 2].map((i) => (
+        <div
+          key={i}
+          className="border rounded-lg bg-card p-4"
+          style={{ marginLeft: i > 0 ? `${i * 48}px` : 0 }}
+        >
+          <div className="flex gap-4">
+            {/* Avatar skeleton */}
+            <div className="flex flex-col items-center gap-1.5">
+              <Skeleton className="h-12 w-12 rounded-md" />
+              <Skeleton className="h-3 w-12" />
+            </div>
+            {/* Content skeleton */}
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-3 w-28" />
+              <Skeleton className="h-4 w-48" />
+              <Skeleton className="h-4 w-12" />
+            </div>
           </div>
-          <Skeleton className="h-8 w-16 rounded-md" />
         </div>
       ))}
     </div>
