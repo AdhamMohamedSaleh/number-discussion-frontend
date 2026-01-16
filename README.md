@@ -1,36 +1,144 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Number Discussions
+
+A social network where people communicate through numbers. Start discussions with a number, respond with mathematical operations, and create collaborative calculation chains.
+
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38bdf8)
+
+## Features
+
+- **Authentication**: Register and login with username/password
+- **Start Discussions**: Post a starting number to begin a new thread
+- **Respond with Math**: Reply using operations (+, −, ×, ÷)
+- **Threaded View**: See calculation chains in a nested tree structure
+- **Dark Mode**: Toggle between light, dark, and system themes
+- **Real-time Feedback**: Toast notifications for all actions
+- **Responsive Design**: Works on desktop and mobile
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS 4 + shadcn/ui
+- **Forms**: react-hook-form
+- **Notifications**: sonner
+- **Icons**: @tabler/icons-react
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- pnpm (recommended) or npm
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Clone the repository
+git clone https://github.com/AdhamMohamedSaleh/number-discussion-frontend.git
+cd number-discussion-frontend
+
+# Install dependencies
+pnpm install
+
+# Copy environment variables
+cp .env.example .env.local
+
+# Start development server
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `NEXT_PUBLIC_API_URL` | Backend API URL (e.g., `https://your-api.railway.app/api`) | Yes |
+| `NEXT_PUBLIC_SITE_URL` | Frontend URL for SEO metadata | No |
 
-## Learn More
+### For Vercel Deployment
 
-To learn more about Next.js, take a look at the following resources:
+Add these environment variables in your Vercel project settings:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+NEXT_PUBLIC_API_URL=https://number-discussion-backend-production.up.railway.app/api
+NEXT_PUBLIC_SITE_URL=https://your-app.vercel.app
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## API Endpoints
 
-## Deploy on Vercel
+The frontend connects to these backend endpoints:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Health check |
+| POST | `/api/auth/register` | Register new user |
+| POST | `/api/auth/login` | Login user |
+| GET | `/api/auth/me` | Get current user (protected) |
+| GET | `/api/calculations` | Get all calculations |
+| GET | `/api/calculations/:id` | Get specific calculation tree |
+| POST | `/api/calculations` | Create calculation (protected) |
+| POST | `/api/calculations/:id/respond` | Respond to calculation (protected) |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project Structure
+
+```
+├── app/                    # Next.js App Router
+│   ├── layout.tsx          # Root layout with providers
+│   ├── page.tsx            # Home page
+│   ├── loading.tsx         # Loading state
+│   ├── error.tsx           # Error boundary
+│   ├── not-found.tsx       # 404 page
+│   ├── robots.ts           # SEO robots.txt
+│   └── sitemap.ts          # SEO sitemap
+├── components/
+│   ├── home-page.tsx       # Main application UI
+│   ├── auth-form.tsx       # Login/Register form
+│   ├── calculation-tree.tsx # Threaded discussion view
+│   ├── create-calculation-form.tsx
+│   ├── respond-form.tsx
+│   ├── theme-toggle.tsx    # Dark mode toggle
+│   ├── error-boundary.tsx  # Error handling
+│   ├── skeleton.tsx        # Loading skeletons
+│   └── ui/                 # shadcn/ui components
+├── lib/
+│   ├── api.ts              # API client with retry logic
+│   ├── auth-context.tsx    # Authentication state
+│   ├── theme-context.tsx   # Theme state
+│   ├── types.ts            # TypeScript types
+│   └── utils.ts            # Utility functions
+└── public/                 # Static assets
+```
+
+## Scripts
+
+```bash
+pnpm dev        # Start development server
+pnpm build      # Build for production
+pnpm start      # Start production server
+pnpm lint       # Run ESLint
+```
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Push your code to GitHub
+2. Import the repository in [Vercel](https://vercel.com)
+3. Add environment variables:
+   - `NEXT_PUBLIC_API_URL`: Your backend API URL
+   - `NEXT_PUBLIC_SITE_URL`: Your Vercel app URL
+4. Deploy
+
+### Other Platforms
+
+```bash
+pnpm build
+pnpm start
+```
+
+## License
+
+MIT
